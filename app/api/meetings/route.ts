@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(request: NextRequest) {
     const date = request.nextUrl.searchParams.get("date") ?? undefined;
 
-    const meetings = getMeetings(date);
+    const meetings = await getMeetings(date);
 
     return NextResponse.json(meetings, { status: 200 });
 }

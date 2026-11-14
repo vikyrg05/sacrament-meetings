@@ -16,7 +16,8 @@ export default async function CurrentMeetingPage() {
         String(currentSunday.getDate()).padStart(2, "0"),
     ].join("-");
 
-    const meeting = getMeetings(sundayDate)[0];
+    const meetings = await getMeetings(sundayDate);
+    const meeting = meetings[0];
 
     if (!meeting) {
         redirect("/meetings");
