@@ -8,7 +8,7 @@ export default async function CurrentMeetingPage() {
     const today = new Date();
     const currentSunday = new Date(today);
 
-    currentSunday.setDate(today.getDate() - today.getDay());
+    currentSunday.setDate(today.getDate() + (7 - today.getDay()) % 7);
 
     const sundayDate = [
         currentSunday.getFullYear(),
@@ -19,7 +19,7 @@ export default async function CurrentMeetingPage() {
     const meeting = getMeetings(sundayDate)[0];
 
     if (!meeting) {
-        return <p>No meeting is scheduled for this Sunday.</p>;
+        redirect("/meetings");
     }
 
     redirect(`/meetings/${meeting.id}`);
