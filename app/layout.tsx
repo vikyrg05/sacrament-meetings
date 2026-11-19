@@ -1,8 +1,10 @@
+
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import NavLinks from "@/components/NavLinks";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -33,12 +35,21 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <Suspense
           fallback={
-            <header className="bg-blue-900 px-6 py-5 text-white">
-              <div className="mx-auto max-w-6xl">
-                <p className="text-sm text-blue-200">Rosedal Ward</p>
-                <p className="text-xl font-bold">
-                  Sacrament Meeting Planner
-                </p>
+            <header className="bg-blue-900 text-white">
+              <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
+                <div>
+                  <p className="text-sm text-blue-200">Rosedal Ward</p>
+
+                  <p className="text-xl font-bold">
+                    Sacrament Meeting Planner
+                  </p>
+
+                  <p className="mt-1 text-sm text-blue-200">
+                    &nbsp;
+                  </p>
+                </div>
+
+                <NavLinks />
               </div>
             </header>
           }

@@ -30,6 +30,8 @@ interface PaginatedMeetings {
     totalCount: number;
 }
 
+type MeetingData = Omit<SacramentMeeting, 'id'>;
+
 function mapMeeting(row: MeetingRow): SacramentMeeting {
     return {
         id: row.id,
@@ -86,7 +88,9 @@ export async function getMeetings(
     return rows.map(mapMeeting);
 }
 
-export async function getMeetingById(id: number): Promise<SacramentMeeting | undefined> {
+export async function getMeetingById(
+    id: number
+): Promise<SacramentMeeting | undefined> {
     const rows = await sql`
         SELECT *,
                TO_CHAR(date, 'YYYY-MM-DD') AS formatted_date
@@ -141,4 +145,78 @@ export async function getPaginatedMeetings(
         meetings: rows.map(mapMeeting),
         totalCount: Number(countRows[0].total),
     };
+}
+
+// Create a new meeting
+export async function createMeeting(
+    meeting: MeetingData
+): Promise<number> {
+    const rows = await sql`
+        INSERT INTO meetings (
+            date,
+            meeting_type,
+            presiding,
+            conducting,
+            announcements,
+            opening_hymn,
+            opening_prayer,
+            ward_business,
+            stake_business,
+            sacrament_hymn,
+            speakers,
+            closing_hymn,
+            closing_prayer
+        )
+        VALUES (
+            ${meeting.date},
+            ${meeting.meetingType},
+            ${meeting.presiding},
+            ${meeting.conducting},
+            ${meeting.announcements ?? []},
+            ${JSON.stringify(meeting.openingHymn)}::jsonb,
+            ${meeting.openingPrayer},
+            ${JSON.stringify(meeting.wardBusiness)}::jsonb,
+            ${meeting.stakeBusiness},
+            ${JSON.stringify(meeting.sacramentHymn)}::jsonb,
+            ${JSON.stringify(meeting.speakers)}::jsonb,
+            ${JSON.stringify(meeting.closingHymn)}::jsonb,
+            ${meeting.closingPrayer}
+        )
+        RETURNING id
+    ` as { id: number }[];
+
+    return rows[0].id;
+}
+
+// Update an existing meeting
+export async function updateMeeting(
+    id: number,
+    meeting: MeetingData
+): Promise<void> {
+    await sql`
+        UPDATE meetings
+        SET
+            date = ${meeting.date},
+            meeting_type = ${meeting.meetingType},
+            presiding = ${meeting.presiding},
+            conducting = ${meeting.conducting},
+            announcements = ${meeting.announcements ?? []},
+            opening_hymn = ${JSON.stringify(meeting.openingHymn)}::jsonb,
+            opening_prayer = ${meeting.openingPrayer},
+            ward_business = ${JSON.stringify(meeting.wardBusiness)}::jsonb,
+            stake_business = ${meeting.stakeBusiness},
+            sacrament_hymn = ${JSON.stringify(meeting.sacramentHymn)}::jsonb,
+            speakers = ${JSON.stringify(meeting.speakers)}::jsonb,
+            closing_hymn = ${JSON.stringify(meeting.closingHymn)}::jsonb,
+            closing_prayer = ${meeting.closingPrayer}
+        WHERE id = ${id}
+    `;
+}
+
+// Delete a meeting
+export async function deleteMeeting(id: number): Promise<void> {
+    await sql`
+        DELETE FROM meetings
+        WHERE id = ${id}
+    `;
 }
